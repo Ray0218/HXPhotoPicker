@@ -18,6 +18,9 @@ typedef NS_ENUM(NSInteger, HXCustomAssetModelType) {
 
 @interface HXCustomAssetModel : NSObject
 
+
+@property (assign, nonatomic) NSInteger rModelId;
+
 /**
  资源类型
  */

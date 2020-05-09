@@ -91,7 +91,8 @@
             [self.delegate collectionView:self gestureRecognizerChange:longPgr indexPath:self.originalIndexPath];
         }
         [self gestureRecognizerChange:longPgr];
-        [self moveCell];
+//        ray
+//        [self moveCell];
     }
     if (longPgr.state == UIGestureRecognizerStateCancelled ||
         longPgr.state == UIGestureRecognizerStateEnded){
@@ -134,12 +135,16 @@
     if (cell.model.type == HXPhotoModelMediaTypeCamera) {
         return;
     }
+    
+ 
+//    ray
+    return ;
     UIView *tempMoveCell = [cell snapshotViewAfterScreenUpdates:NO];
     self.dragCell = cell;
     cell.hidden = YES;
     self.tempMoveCell = tempMoveCell;
     self.tempMoveCell.frame = cell.frame;
-    [UIView animateWithDuration:0.2 animations:^{
+     [UIView animateWithDuration:0.2 animations:^{
         self.tempMoveCell.alpha = 0.8;
         self.tempMoveCell.transform = CGAffineTransformMakeScale(1.15, 1.15);
     }];

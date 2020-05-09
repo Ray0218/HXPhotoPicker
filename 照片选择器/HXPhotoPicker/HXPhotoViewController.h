@@ -71,6 +71,9 @@ HXAlbumListViewController;
 @end
 
 @interface HXPhotoViewCell : UICollectionViewCell
+//已选择的个数
+@property (assign, nonatomic) NSUInteger rOriginSelectCount;
+
 @property (weak, nonatomic) id<HXPhotoViewCellDelegate> delegate;
 @property (assign, nonatomic) NSInteger section;
 @property (assign, nonatomic) NSInteger item;

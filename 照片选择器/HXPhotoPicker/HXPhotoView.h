@@ -238,9 +238,14 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 /// 每次需要更新高度的时候触发，请确保高度正确
 /// @param photoView self
 - (CGFloat)photoViewHeight:(HXPhotoView *)photoView;
+
+
+-(UICollectionReusableView*)rCollectionSectionHeader:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath ;
+
+- (CGSize)rCollectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section;
 @end
 
-@interface HXPhotoView : UIView
+@interface  HXPhotoView : UIView
 #pragma mark - < init >
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager;
 - (instancetype)initWithFrame:(CGRect)frame manager:(HXPhotoManager *)manager scrollDirection:(UICollectionViewScrollDirection)scrollDirection;
@@ -254,6 +259,7 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) NSIndexPath *currentIndexPath; // 自定义转场动画时用到的属性
 @property (strong, nonatomic) HXCollectionView *collectionView;
+@property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 
 #pragma mark - < Block >
 /**  照片/视频发生改变时调用 - 选择、移动顺序、删除  */
@@ -314,6 +320,18 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 /// 底部选择视图是否自适应暗黑风格
 @property (assign, nonatomic) BOOL adaptiveDarkness;
 
+//长按删除
+@property (assign, nonatomic) BOOL rIsLongPressDelete;
+
+//单个显示
+@property (assign, nonatomic) BOOL rIsSignalShow;
+
+
+@property (assign, nonatomic) BOOL rIsAllowScroll;
+
+@property (assign, nonatomic) BOOL rNoDeleteFirst;//第一个不能删除
+
+
 /**  跳转相册 如果需要选择相机/相册时 还是需要选择  */
 - (void)goPhotoViewController;
 /**  跳转相册 过滤掉选择 - 不管需不需要选择 直接前往相册  */
@@ -332,4 +350,6 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
  */
 - (HXPhotoSubViewCell *)previewingContextViewWithPoint:(CGPoint)point;
 - (HXPhotoSubViewCell *)collectionViewCellWithIndex:(NSInteger)index;
+
+- (void)setupNewFrame ;
 @end

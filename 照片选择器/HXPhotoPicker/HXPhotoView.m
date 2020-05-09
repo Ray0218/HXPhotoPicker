@@ -27,7 +27,6 @@
 @property (strong, nonatomic) HXPhotoModel *addModel;
 @property (assign, nonatomic) BOOL isAddModel;
 @property (assign, nonatomic) BOOL original;
-@property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 @property (assign, nonatomic) NSInteger numOfLinesOld; 
 @property (assign, nonatomic) BOOL downLoadComplete;
 @property (strong, nonatomic) UIImage *tempCameraImage;
@@ -44,6 +43,7 @@
     if (!_flowLayout) {
         _flowLayout = [[UICollectionViewFlowLayout alloc] init];
         _flowLayout.scrollDirection = self.scrollDirection;
+
     }
     return _flowLayout;
 }
@@ -125,7 +125,8 @@
 - (HXCollectionView *)collectionView {
     if (!_collectionView) {
         _collectionView = [[HXCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:self.flowLayout];
-        _collectionView.tag = 8888;
+        
+          _collectionView.tag = 8888;
         if (self.scrollDirection != UICollectionViewScrollDirectionHorizontal) {
             _collectionView.scrollEnabled = NO;
         }
@@ -134,6 +135,11 @@
         _collectionView.backgroundColor = self.backgroundColor;
         [_collectionView registerClass:[HXPhotoSubViewCell class] forCellWithReuseIdentifier:@"HXPhotoSubViewCellId"];
         [_collectionView registerClass:[HXPhotoSubViewCell class] forCellWithReuseIdentifier:@"addCell"];
+        
+         if (@available(iOS 11.0, *)) {
+            _collectionView.contentInsetAdjustmentBehavior  = UIScrollViewContentInsetAdjustmentNever;
+        }  
+ 
     }
     return _collectionView;
 }
@@ -150,7 +156,20 @@
     }else {
         self.collectionView.scrollEnabled = NO;
     }
+    
+    if (self.rIsSignalShow) {
+        self.collectionView.clipsToBounds = YES ;
+        self.collectionView.pagingEnabled = YES;
+    }
+    
+    if (self.rIsAllowScroll) {
+        self.collectionView.scrollEnabled = YES ;
+        self.collectionView.clipsToBounds = YES ;
+
+    }
     self.flowLayout.scrollDirection = scrollDirection;
+    
+
 }
 - (void)setup {
     if (_manager) {
@@ -283,6 +302,14 @@
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return 1;
 }
+
+-(UICollectionReusableView*)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(rCollectionSectionHeader:viewForSupplementaryElementOfKind:atIndexPath:)]) {
+        return [self.delegate rCollectionSectionHeader:collectionView viewForSupplementaryElementOfKind:kind atIndexPath:indexPath] ;
+    }
+    return nil ;
+}
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     if (self.tempShowAddCell) {
         if (indexPath.item == self.dataList.count) {
@@ -299,7 +326,22 @@
     }
     cell.model = self.dataList[indexPath.item];
     cell.showDeleteNetworkPhotoAlert = self.showDeleteNetworkPhotoAlert;
-    cell.hideDeleteButton = self.hideDeleteButton;
+    
+    if(!self.hideDeleteButton && indexPath.item == 0 && self.rNoDeleteFirst  ){
+        
+        HXPhotoModel *mode = self.dataList[indexPath.item];
+        if (mode.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork) {
+            cell.hideDeleteButton = YES ;
+            mode.rCanNotDelete = YES;
+        }else{
+            cell.hideDeleteButton = self.hideDeleteButton;
+            
+        }
+    }else{
+        cell.hideDeleteButton = self.hideDeleteButton;
+    }
+  
+    
     return cell;
 }
  
@@ -314,7 +356,24 @@
     }
     return canSelect;
 }
+
+- (CGSize)CollectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(rCollectionView:layout:referenceSizeForHeaderInSection:)]) {
+        return    [self.delegate rCollectionView:collectionView layout:collectionViewLayout referenceSizeForHeaderInSection:section];
+    }
+    
+    return CGSizeZero ;
+}
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    
+//    ray
+    if (self.rIsLongPressDelete && !self.hideDeleteButton) {
+        self.hideDeleteButton = YES ;
+        [self.collectionView reloadData];
+        return ;
+    }
+/////////
+    
     if (self.tempShowAddCell) {
         if (indexPath.item == self.dataList.count) {
             if ([self.delegate respondsToSelector:@selector(photoViewDidAddCellClick:)]) {
@@ -810,8 +869,13 @@
     [self setupNewFrame];
     if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal &&
         self.dataList.count) {
-        NSInteger currentItem = self.tempShowAddCell ? self.dataList.count : self.dataList.count - 1;
+        
+        //ray
+        if (!self.rIsSignalShow) {
+             
+         NSInteger currentItem = self.tempShowAddCell ? self.dataList.count : self.dataList.count - 1;
         [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:currentItem inSection:0] atScrollPosition:UICollectionViewScrollPositionRight animated:YES];
+        }
     }
 }
 - (NSArray *)dataSourceArrayOfCollectionView:(HXCollectionView *)collectionView {
@@ -880,6 +944,15 @@
 }
 - (void)collectionView:(UICollectionView *)collectionView gestureRecognizerBegan:(UILongPressGestureRecognizer *)longPgr indexPath:(NSIndexPath *)indexPath {
     if (indexPath) {
+        
+        
+        //ray
+        if (self.rIsLongPressDelete && self.hideDeleteButton) {
+            self.hideDeleteButton = NO;
+            [self.collectionView reloadData];
+        }
+//        ////
+        
         if ([self.delegate respondsToSelector:@selector(photoView:gestureRecognizerBegan:indexPath:)]) {
             [self.delegate photoView:self gestureRecognizerBegan:longPgr indexPath:indexPath];
         }
@@ -919,19 +992,51 @@
     }
     return [NSIndexPath indexPathForItem:0 inSection:0];
 }
+
+ 
 #pragma mark - < 更新高度 >
 - (void)setupNewFrame {
+    
+    self.flowLayout.minimumLineSpacing = self.spacing;
+      self.flowLayout.minimumInteritemSpacing = self.spacing;
+    
+    if (self.rIsSignalShow) {
+        self.flowLayout.itemSize = CGSizeMake(self.hx_w, self.hx_h);
+        return ;
+    }
+    
+  
+    
     UIEdgeInsets insets = self.collectionView.contentInset;
+    
+      if (self.rIsAllowScroll) {
+                       insets = self.flowLayout.sectionInset ;
+          self.collectionView.bounces = YES ;
+       }
+    
+    
     CGFloat itemW = (self.hx_w - self.spacing * (self.lineCount - 1) - insets.left - insets.right) / self.lineCount;
+   
+    
+ 
+    
     if (self.scrollDirection == UICollectionViewScrollDirectionHorizontal) itemW -= 10;
-    if (itemW) self.flowLayout.itemSize = CGSizeMake(itemW, itemW);
+    if (itemW) self.flowLayout.itemSize = CGSizeMake(floor(itemW),itemW);
+    
+    
+    if (self.rIsAllowScroll) {
+        
+         return ;
+    }
+    
+    
+    
     
     NSInteger dataCount = self.tempShowAddCell ? self.dataList.count + 1 : self.dataList.count;
     NSInteger numOfLinesNew = 0;
     if (self.lineCount != 0) numOfLinesNew = (dataCount / self.lineCount) + 1;
     if (dataCount % self.lineCount == 0) numOfLinesNew -= 1;
-    self.flowLayout.minimumLineSpacing = self.spacing;
-    self.flowLayout.minimumInteritemSpacing = self.spacing;
+  
     
     if (numOfLinesNew != self.numOfLinesOld) {
         self.numOfLinesOld = numOfLinesNew;
@@ -974,7 +1079,7 @@
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;
     
-    if (dataCount == 1) {
+    if (dataCount == 1 && !self.rIsAllowScroll) {
         if ([self.delegate respondsToSelector:@selector(photoViewHeight:)]) {
             self.hx_h = [self.delegate photoViewHeight:self];
         }else {

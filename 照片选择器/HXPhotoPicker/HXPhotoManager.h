@@ -51,6 +51,11 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
  */
 @property (strong, nonatomic) HXPhotoConfiguration *configuration;
 
+
+//是否隐藏之前的
+@property (assign, nonatomic) BOOL rHiddenLastSelect;
+
+
 /**
  @param type 选择类型
  @return self
@@ -77,6 +82,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
  @param assetArray 模型数组
  */
 - (void)addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray;
+- (void)kl_addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray;
+
 
 /**
  获取已选照片数组的照片总大小
@@ -144,6 +151,11 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
  网络图片地址数组
  */
 @property (strong, nonatomic) NSArray<NSString *> *networkPhotoUrls DEPRECATED_MSG_ATTRIBUTE("Use 'addCustomAssetModel:' instead");
+
+
+@property (assign, nonatomic) NSUInteger rOriginNum;
+@property (assign, nonatomic) NSUInteger rOriginPhotoNum;
+@property (assign, nonatomic) NSUInteger rOriginVideoNum;
 
 
 /**
@@ -385,6 +397,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 @property (copy, nonatomic) getSelectAlbumBlock selectAlbumBlock;
 @property (copy, nonatomic) getAllAlbumListBlock allAlbumListBlock;
 @property (copy, nonatomic) getPhotoListBlock photoListBlock;
+
+typedef void (^ getPhotoListBlock)(NSArray *allList , NSArray *previewList,NSArray *photoList ,NSArray *videoList ,NSArray *dateList , HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel);
 
 @property (copy, nonatomic) NSArray *tempAllList;
 @property (copy, nonatomic) NSArray *tempPreviewList;

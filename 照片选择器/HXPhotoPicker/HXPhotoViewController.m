@@ -176,13 +176,13 @@ HXVideoEditViewControllerDelegate
     }
 
     if (self.manager.configuration.open3DTouchPreview) {
-//#ifdef __IPHONE_13_0
-//        if (@available(iOS 13.0, *)) {
-//            [HXPhotoCommon photoCommon].isHapticTouch = YES;
-//#else
-//        if ((NO)) {
-//#endif
-//        }else {
+#ifdef __IPHONE_13_0
+        if (@available(iOS 13.0, *)) {
+            [HXPhotoCommon photoCommon].isHapticTouch = YES;
+#else
+        if ((NO)) {
+#endif
+        }else {
             if ([self respondsToSelector:@selector(traitCollection)]) {
                 if ([self.traitCollection respondsToSelector:@selector(forceTouchCapability)]) {
                     if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
@@ -191,7 +191,7 @@ HXVideoEditViewControllerDelegate
                     }
                 }
             }
-//        }
+        }
     }
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
@@ -264,7 +264,7 @@ HXVideoEditViewControllerDelegate
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     CGFloat navBarHeight = hxNavigationBarHeight;
     NSInteger lineCount = self.manager.configuration.rowCount;
-    if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
+    if (orientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationPortrait == UIInterfaceOrientationPortraitUpsideDown) {
         navBarHeight = hxNavigationBarHeight;
         lineCount = self.manager.configuration.rowCount;
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
@@ -811,6 +811,7 @@ HXVideoEditViewControllerDelegate
         }else {
             cell.selectBgColor = self.manager.configuration.themeColor;
         }
+        cell.rOriginSelectCount = self.manager.rOriginNum;
         cell.model = model;
         cell.singleSelected = self.manager.configuration.singleSelected;
         return cell;
@@ -1034,25 +1035,25 @@ HXVideoEditViewControllerDelegate
     }
 }
 #pragma mark - < preview Haptic Touch >
-//#ifdef __IPHONE_13_0
-//- (UIContextMenuConfiguration *)collectionView:(UICollectionView *)collectionView contextMenuConfigurationForItemAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point  API_AVAILABLE(ios(13.0)) {
-//    HXPhotoModel *_model;
-//    if (self.manager.configuration.showDateSectionHeader) {
-//        HXPhotoDateModel *dateModel = [self.dateArray objectAtIndex:indexPath.section];
-//        _model = [dateModel.photoModelArray objectAtIndex:indexPath.item];
-//    }else {
-//        _model = [self.allArray objectAtIndex:indexPath.item];
-//    }
-//    HXWeakSelf
-//    UIContextMenuConfiguration *menuConfiguration = [UIContextMenuConfiguration configurationWithIdentifier:_model.localIdentifier ?: _model.cameraIdentifier previewProvider:^UIViewController * _Nullable{
-//        return [weakSelf previewViewControlerWithIndexPath:indexPath];
-//    } actionProvider:nil];
-//    return menuConfiguration;
-//}
-//- (void)collectionView:(UICollectionView *)collectionView willPerformPreviewActionForMenuWithConfiguration:(UIContextMenuConfiguration *)configuration animator:(id<UIContextMenuInteractionCommitAnimating>)animator API_AVAILABLE(ios(13.0)) {
-//    [self pushPreviewControler:animator.previewViewController];
-//}
-//#endif
+#ifdef __IPHONE_13_0
+- (UIContextMenuConfiguration *)collectionView:(UICollectionView *)collectionView contextMenuConfigurationForItemAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point  API_AVAILABLE(ios(13.0)) {
+    HXPhotoModel *_model;
+    if (self.manager.configuration.showDateSectionHeader) {
+        HXPhotoDateModel *dateModel = [self.dateArray objectAtIndex:indexPath.section];
+        _model = [dateModel.photoModelArray objectAtIndex:indexPath.item];
+    }else {
+        _model = [self.allArray objectAtIndex:indexPath.item];
+    }
+    HXWeakSelf
+    UIContextMenuConfiguration *menuConfiguration = [UIContextMenuConfiguration configurationWithIdentifier:_model.localIdentifier ?: _model.cameraIdentifier previewProvider:^UIViewController * _Nullable{
+        return [weakSelf previewViewControlerWithIndexPath:indexPath];
+    } actionProvider:nil];
+    return menuConfiguration;
+}
+- (void)collectionView:(UICollectionView *)collectionView willPerformPreviewActionForMenuWithConfiguration:(UIContextMenuConfiguration *)configuration animator:(id<UIContextMenuInteractionCommitAnimating>)animator API_AVAILABLE(ios(13.0)) {
+    [self pushPreviewControler:animator.previewViewController];
+}
+#endif
 - (UIViewController *)previewViewControlerWithIndexPath:(NSIndexPath *)indexPath {
     HXPhotoViewCell *cell = (HXPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
     if (!cell || cell.model.type == HXPhotoModelMediaTypeCamera || cell.model.isICloud) {
@@ -1215,7 +1216,15 @@ HXVideoEditViewControllerDelegate
         [self.manager beforeSelectedListAddPhotoModel:cell.model];
         cell.selectMaskLayer.hidden = NO;
         selectBtn.selected = YES;
-        [selectBtn setTitle:cell.model.selectIndexStr forState:UIControlStateSelected];
+        //ray
+        if (model.selectIndexStr && model.selectIndexStr.length) {
+            [selectBtn setTitle:[NSString stringWithFormat:@"%ld",cell.model.selectIndexStr.integerValue - self.manager.rOriginNum] forState:UIControlStateSelected];
+            
+        }else{
+            [selectBtn setTitle:cell.model.selectIndexStr forState:UIControlStateSelected];
+            
+        }
+        
         CAKeyframeAnimation *anim = [CAKeyframeAnimation animationWithKeyPath:@"transform.scale"];
         anim.duration = 0.25;
         anim.values = @[@(1.2),@(0.8),@(1.1),@(0.9),@(1.0)];
@@ -1226,7 +1235,7 @@ HXVideoEditViewControllerDelegate
     if (!selectBtn.selected) {
         NSInteger index = 0;
         for (HXPhotoModel *model in [self.manager selectedArray]) {
-            model.selectIndexStr = [NSString stringWithFormat:@"%ld",index + 1];
+            model.selectIndexStr = [NSString stringWithFormat:@"%ld",index + 1 ];
             if (model.currentAlbumIndex == self.albumModel.index) {
                 if (model.dateCellIsVisible) {
                     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:[self dateItem:model] inSection:model.dateSection];
@@ -1292,7 +1301,7 @@ HXVideoEditViewControllerDelegate
     if (!model.selected) {
         NSInteger index = 0;
         for (HXPhotoModel *subModel in [self.manager selectedArray]) {
-            subModel.selectIndexStr = [NSString stringWithFormat:@"%ld",index + 1];
+            subModel.selectIndexStr = [NSString stringWithFormat:@"%ld",index + 1 ];
             if (subModel.currentAlbumIndex == self.albumModel.index && subModel.dateCellIsVisible) {
                 NSIndexPath *indexPath = [NSIndexPath indexPathForItem:[self dateItem:subModel] inSection:subModel.dateSection];
                 [indexPathList addObject:indexPath];
@@ -2033,6 +2042,8 @@ HXVideoEditViewControllerDelegate
 @property (strong, nonatomic) HXCircleProgressView *progressView;
 @property (strong, nonatomic) CALayer *videoMaskLayer;
 @property (strong, nonatomic) UIView *highlightMaskView;
+    
+
 @end
 
 @implementation HXPhotoViewCell
@@ -2076,6 +2087,7 @@ HXVideoEditViewControllerDelegate
     self = [super initWithFrame:frame];
     if (self) {
         [self setupUI];
+        self.rOriginSelectCount = 0;
     }
     return self;
 }
@@ -2187,7 +2199,17 @@ HXVideoEditViewControllerDelegate
     }
     self.selectMaskLayer.hidden = !model.selected;
     self.selectBtn.selected = model.selected;
-    [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
+    
+    //ray
+    if (model.selectIndexStr && model.selectIndexStr.length) {
+        [self.selectBtn setTitle:[NSString stringWithFormat:@"%ld",model.selectIndexStr.integerValue - self.rOriginSelectCount] forState:UIControlStateSelected];
+        
+    }else{
+        [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
+        
+    }
+
+//    [self.selectBtn setTitle:model.selectIndexStr forState:UIControlStateSelected];
     
     self.iCloudIcon.hidden = !model.isICloud;
     self.iCloudMaskLayer.hidden = !model.isICloud;
@@ -2357,6 +2379,11 @@ HXVideoEditViewControllerDelegate
     if (self.model.isICloud) {
         return;
     }
+    
+    if(self.model.rCanNotDelete){
+        return;
+    }
+    
     if ([self.delegate respondsToSelector:@selector(photoViewCell:didSelectBtn:)]) {
         [self.delegate photoViewCell:self didSelectBtn:button];
     }
@@ -2882,7 +2909,7 @@ HXVideoEditViewControllerDelegate
 }
 - (void)setSelectCount:(NSInteger)selectCount {
     _selectCount = selectCount;
-    if (selectCount <= 0) {
+    if (selectCount - self.manager.rOriginNum <= 0) {
         self.previewBtn.enabled = NO;
         self.doneBtn.enabled = NO;
         [self.doneBtn setTitle:[NSBundle hx_localizedStringForKey:@"完成"] forState:UIControlStateNormal];
@@ -2893,13 +2920,20 @@ HXVideoEditViewControllerDelegate
             if (!self.manager.configuration.selectTogether) {
                 if (self.manager.selectedPhotoCount > 0) {
                     NSInteger maxCount = self.manager.configuration.photoMaxNum > 0 ? self.manager.configuration.photoMaxNum : self.manager.configuration.maxNum;
+                    maxCount -= self.manager.rOriginNum;
+                    selectCount -= self.manager.rOriginNum;
+                    
                     [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],(long)selectCount,(long)maxCount] forState:UIControlStateNormal];
                 }else {
                     NSInteger maxCount = self.manager.configuration.videoMaxNum > 0 ? self.manager.configuration.videoMaxNum : self.manager.configuration.maxNum;
+                    
+                    maxCount -= self.manager.rOriginNum;
+                                       selectCount -= self.manager.rOriginNum;
+                                       
                     [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%ld)",[NSBundle hx_localizedStringForKey:@"完成"],(long)selectCount,(long)maxCount] forState:UIControlStateNormal];
                 }
             }else {
-                [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%lu)",[NSBundle hx_localizedStringForKey:@"完成"],(long)selectCount,(unsigned long)self.manager.configuration.maxNum] forState:UIControlStateNormal];
+                [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld/%lu)",[NSBundle hx_localizedStringForKey:@"完成"],(long)selectCount - self.manager.rOriginNum,(unsigned long)self.manager.configuration.maxNum - self.manager.rOriginNum] forState:UIControlStateNormal];
             }
         }else {
             [self.doneBtn setTitle:[NSString stringWithFormat:@"%@(%ld)",[NSBundle hx_localizedStringForKey:@"完成"],(long)selectCount] forState:UIControlStateNormal];

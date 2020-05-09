@@ -16,6 +16,8 @@
 @property (strong, nonatomic) HXCircleProgressView *progressView;
 @property (assign, nonatomic) int32_t requestID;
 @property (strong, nonatomic) UILabel *stateLb;
+@property (strong, nonatomic) UILabel *rVideoStateLab;
+
 @property (strong, nonatomic) CAGradientLayer *bottomMaskLayer;
 @end
 
@@ -48,15 +50,30 @@
     }
     return _stateLb;
 }
+
+
+- (UILabel *)rVideoStateLab {
+    if (!_rVideoStateLab) {
+        _rVideoStateLab = [[UILabel alloc] init];
+        _rVideoStateLab.textColor = [UIColor lightGrayColor];
+        _rVideoStateLab.textAlignment = NSTextAlignmentCenter;
+        _rVideoStateLab.font = [UIFont fontWithName:@"iconfont" size: 34];
+        _rVideoStateLab.text = @"\U0000e601";
+        _rVideoStateLab.backgroundColor = [UIColor clearColor];
+        _rVideoStateLab.hidden = YES;
+    }
+    return _rVideoStateLab;
+}
+
 - (CAGradientLayer *)bottomMaskLayer {
     if (!_bottomMaskLayer) {
-        _bottomMaskLayer = [CAGradientLayer layer]; 
+        _bottomMaskLayer = [CAGradientLayer layer];
         _bottomMaskLayer.colors = @[
-                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0].CGColor ,
-                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.15].CGColor ,
-                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.35].CGColor ,
-                                    (id)[[UIColor blackColor] colorWithAlphaComponent:0.6].CGColor
-                                    ];
+            (id)[[UIColor blackColor] colorWithAlphaComponent:0].CGColor ,
+            (id)[[UIColor blackColor] colorWithAlphaComponent:0.15].CGColor ,
+            (id)[[UIColor blackColor] colorWithAlphaComponent:0.35].CGColor ,
+            (id)[[UIColor blackColor] colorWithAlphaComponent:0.6].CGColor
+        ];
         _bottomMaskLayer.startPoint = CGPointMake(0, 0);
         _bottomMaskLayer.endPoint = CGPointMake(0, 1);
         _bottomMaskLayer.locations = @[@(0.15f),@(0.35f),@(0.6f),@(0.9f)];
@@ -85,6 +102,7 @@
     [self.contentView addSubview:self.deleteBtn];
     [self.contentView addSubview:self.progressView];
     [self.contentView addSubview:self.highlightMaskView];
+    [self.contentView addSubview:self.rVideoStateLab];
 }
 
 - (void)didDeleteClick {
@@ -100,7 +118,6 @@
 #elif HasYYKit
     [self.imageView cancelCurrentImageRequest];
 #elif HasSDWebImage
-//    [self.imageView sd_cancelCurrentAnimationImagesLoad];
 #endif
     if ([self.delegate respondsToSelector:@selector(cellDidDeleteClcik:)]) {
         [self.delegate cellDidDeleteClcik:self];
@@ -133,7 +150,7 @@
                     weakSelf.progressView.progress = 1;
                     weakSelf.progressView.hidden = YES;
                     weakSelf.imageView.image = image;
-                    weakSelf.userInteractionEnabled = YES; 
+                    weakSelf.userInteractionEnabled = YES;
                 }
             }
         }
@@ -151,8 +168,8 @@
 }
 - (void)resetNetworkImage {
     if (self.model.networkPhotoUrl &&
-       (self.model.type == HXPhotoModelMediaTypeCameraPhoto ||
-        self.model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork)) {
+        (self.model.type == HXPhotoModelMediaTypeCameraPhoto ||
+         self.model.cameraVideoType == HXPhotoModelMediaTypeCameraVideoTypeNetWork)) {
         self.model.loadOriginalImage = YES;
         HXWeakSelf
         [self.imageView hx_setImageWithModel:self.model original:YES progress:nil completed:^(UIImage *image, NSError *error, HXPhotoModel *model) {
@@ -167,7 +184,8 @@
     self.progressView.hidden = YES;
     self.progressView.progress = 0;
     self.imageView.image = nil;
-    
+    self.rVideoStateLab.hidden = YES ;
+
     if (model.type == HXPhotoModelMediaTypeCamera) {
         self.deleteBtn.hidden = YES;
         self.imageView.image = model.thumbPhoto;
@@ -177,7 +195,7 @@
             model.asset = [[PHAsset fetchAssetsWithLocalIdentifiers:@[model.localIdentifier] options:options] firstObject];
         }
         self.deleteBtn.hidden = NO;
-        if (model.networkPhotoUrl) {
+        if (model.networkPhotoUrl&& model.networkPhotoUrl.absoluteString.length) {
             HXWeakSelf
             self.progressView.hidden = model.downloadComplete;
             [self.imageView hx_setImageWithModel:model original:NO progress:^(CGFloat progress, HXPhotoModel *model) {
@@ -222,8 +240,10 @@
         self.bottomMaskLayer.hidden = NO;
     }else {
         if (model.subType == HXPhotoModelMediaSubTypeVideo) {
+            
+            self.rVideoStateLab.hidden = NO ;
             self.stateLb.text = model.videoTime;
-            self.stateLb.hidden = NO;
+            self.stateLb.hidden = YES;
             self.bottomMaskLayer.hidden = NO;
         }else {
             if (model.cameraPhotoType == HXPhotoModelMediaTypeCameraPhotoTypeNetWorkGif) {
@@ -231,7 +251,7 @@
                 self.stateLb.hidden = NO;
                 self.bottomMaskLayer.hidden = NO;
                 return;
-            } 
+            }
             self.stateLb.hidden = YES;
             self.bottomMaskLayer.hidden = YES;
         }
@@ -245,6 +265,9 @@
     
     self.stateLb.frame = CGRectMake(0, self.hx_h - 18, self.hx_w - 4, 18);
     self.bottomMaskLayer.frame = CGRectMake(0, self.hx_h - 25, self.hx_w, 25);
+    
+    self.rVideoStateLab.frame = self.bounds;
+
     
     CGFloat width = self.frame.size.width;
     CGFloat height = self.frame.size.height;

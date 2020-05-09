@@ -68,6 +68,9 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 };
 
 @interface HXPhotoModel : NSObject<NSCoding>
+
+@property (assign, nonatomic) NSInteger rModelId;
+
 /**
  文件在手机里的原路径(照片 或 视频)
  只有在手机存在的图片才会有值, iCloud上的没有
@@ -85,6 +88,10 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
  或者将配置类里的 requestImageAfterFinishingSelection 设为YES，点击完成后会自动获取视频地址并且赋值给videoURL
  */
 @property (strong, nonatomic) NSURL * _Nullable fileURL DEPRECATED_MSG_ATTRIBUTE("Use 'exportVideoWithPresetName:startRequestICloud:iCloudProgressHandler:exportProgressHandler:success:failed' instead");
+
+
+@property (nonatomic, assign) BOOL  rCanNotDelete;
+ 
 /**
  创建日期
  
@@ -120,6 +127,7 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 @property (assign, nonatomic) NSInteger selectedIndex;
 /**  模型所对应的选中下标 */
 @property (copy, nonatomic) NSString * _Nullable selectIndexStr;
+ 
 /**  照片原始宽高 */
 @property (assign, nonatomic) CGSize imageSize;
 /**  本地视频URL / 网络视频地址 */

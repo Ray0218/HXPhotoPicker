@@ -1217,7 +1217,7 @@ HXVideoEditViewControllerDelegate
         cell.selectMaskLayer.hidden = NO;
         selectBtn.selected = YES;
         //ray
-        if (model.selectIndexStr && model.selectIndexStr.length) {
+        if (cell.model.selectIndexStr && cell.model.selectIndexStr.length) {
             [selectBtn setTitle:[NSString stringWithFormat:@"%ld",cell.model.selectIndexStr.integerValue - self.manager.rOriginNum] forState:UIControlStateSelected];
             
         }else{

@@ -61,7 +61,7 @@
 }
 - (instancetype)initWithType:(HXPhotoManagerSelectedType)type {
     if (self = [super init]) {
-        _type = type;
+        self.type = type;
         [self setup];
     }
     return self;
@@ -73,8 +73,14 @@
     if (_type != type) {
         self.cameraRollAlbumModel = nil;
         [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
-
+        
     }
+    
+    if ([HXPhotoCommon photoCommon].rCurType != type) {
+        [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
+    }
+    
+    [HXPhotoCommon photoCommon].rCurType = type;
     _type = type;
 }
 - (NSOperationQueue *)dataOperationQueue {

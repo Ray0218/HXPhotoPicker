@@ -25,14 +25,14 @@ typedef void (^ getSelectAlbumBlock)(HXAlbumModel *selectedModel);
 
 typedef void (^ getPhotoListBlock)(NSArray *allList , NSArray *previewList,NSArray *photoList ,NSArray *videoList ,NSArray *dateList , HXPhotoModel *firstSelectModel, HXAlbumModel *albumModel);
 
-/**
- *  照片选择器的管理类, 使用照片选择器时必须先懒加载此类,然后赋值给对应的对象
- */
-typedef NS_ENUM(NSUInteger, HXPhotoManagerSelectedType) {
-    HXPhotoManagerSelectedTypePhoto = 0,        //!< 只显示图片
-    HXPhotoManagerSelectedTypeVideo = 1,        //!< 只显示视频
-    HXPhotoManagerSelectedTypePhotoAndVideo     //!< 图片和视频一起显示
-};
+///**
+// *  照片选择器的管理类, 使用照片选择器时必须先懒加载此类,然后赋值给对应的对象
+// */
+//typedef NS_ENUM(NSUInteger, HXPhotoManagerSelectedType) {
+//    HXPhotoManagerSelectedTypePhoto = 0,        //!< 只显示图片
+//    HXPhotoManagerSelectedTypeVideo = 1,        //!< 只显示视频
+//    HXPhotoManagerSelectedTypePhotoAndVideo     //!< 图片和视频一起显示
+//};
 
 typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
     HXPhotoManagerVideoSelectedTypeNormal = 0,  //!< 普通状态显示选择按钮

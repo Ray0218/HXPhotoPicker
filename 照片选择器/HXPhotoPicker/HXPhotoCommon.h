@@ -19,6 +19,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ *  照片选择器的管理类, 使用照片选择器时必须先懒加载此类,然后赋值给对应的对象
+ */
+typedef NS_ENUM(NSUInteger, HXPhotoManagerSelectedType) {
+    HXPhotoManagerSelectedTypePhoto = 0,        //!< 只显示图片
+    HXPhotoManagerSelectedTypeVideo = 1,        //!< 只显示视频
+    HXPhotoManagerSelectedTypePhotoAndVideo     //!< 图片和视频一起显示
+};
+
+
 typedef void (^ HXPhotoCommonGetUrlFileLengthSuccess)(NSUInteger length);
 typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
 
@@ -38,6 +48,11 @@ typedef void (^ HXPhotoCommonGetUrlFileLengthFailure)(void);
 @property (assign, nonatomic) BOOL isVCBasedStatusBarAppearance;
 
 @property (assign, nonatomic) BOOL isHapticTouch;
+
+/**
+ 当前选择类型
+ */
+@property (assign, nonatomic) HXPhotoManagerSelectedType rCurType;
 
 #if HasAFNetworking
 @property (assign, nonatomic) AFNetworkReachabilityStatus netStatus;

@@ -70,15 +70,12 @@
     return [self initWithType:HXPhotoManagerSelectedTypePhoto];
 }
 - (void)setType:(HXPhotoManagerSelectedType)type {
-    if (_type != type) {
+    if (_type != type || [HXPhotoCommon photoCommon].rCurType != type) {
         self.cameraRollAlbumModel = nil;
         [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
         
     }
-    
-    if ([HXPhotoCommon photoCommon].rCurType != type) {
-        [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
-    }
+ 
     
     [HXPhotoCommon photoCommon].rCurType = type;
     _type = type;

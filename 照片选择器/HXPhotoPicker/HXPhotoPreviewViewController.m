@@ -1173,6 +1173,7 @@ HXVideoEditViewControllerDelegate
         _bottomPageControl.currentPageIndicatorTintColor = [UIColor whiteColor];
         _bottomPageControl.pageIndicatorTintColor = [[UIColor whiteColor] colorWithAlphaComponent:0.5f];
         _bottomPageControl.numberOfPages = self.modelArray.count;
+        _bottomPageControl.hidesForSinglePage = YES;
     }
     return _bottomPageControl;
 }

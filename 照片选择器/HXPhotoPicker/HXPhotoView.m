@@ -426,6 +426,30 @@
     }
 }
 
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if (!decelerate) {
+        if (!scrollView.dragging && !scrollView.decelerating) {
+            [self scrollViewDidEndScroll];
+        }
+        
+    }
+}
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    if (!scrollView.dragging && !scrollView.decelerating) {
+        [self scrollViewDidEndScroll];
+    }
+}
+
+- (void)scrollViewDidEndScroll {
+    NSLog(@"--already-stop---");
+    
+    NSInteger row =  self.collectionView.contentOffset.x/CGRectGetWidth(self.collectionView.bounds);
+    
+    self.rCurrentPath = [NSIndexPath indexPathForRow:row inSection:0];
+}
+
+
+
 #pragma mark - < HXPhotoPreviewViewControllerDelegate >
 - (void)photoPreviewControllerDidCancel:(HXPhotoPreviewViewController *)previewController model:(HXPhotoModel *)model {
     if ([self.delegate respondsToSelector:@selector(photoViewPreviewDismiss:)]) {

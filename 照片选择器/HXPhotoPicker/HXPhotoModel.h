@@ -71,6 +71,9 @@ typedef NS_ENUM(NSUInteger, HXPhotoModelFormat) {
 
 @property (assign, nonatomic) NSInteger rModelId;
 
+@property (assign, nonatomic) BOOL rIsVideo;
+
+
 /**
  文件在手机里的原路径(照片 或 视频)
  只有在手机存在的图片才会有值, iCloud上的没有

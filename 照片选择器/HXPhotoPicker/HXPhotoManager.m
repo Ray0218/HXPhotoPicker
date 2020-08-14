@@ -157,6 +157,43 @@
         [self.endSelectedList addObject:photoModel];
     }
 }
+
+- (void)kl_InsetHXPhotoModel:(NSArray<HXPhotoModel *> *)assetArray   {
+    if (!assetArray.count) return;
+    if (![assetArray.firstObject isKindOfClass:[HXPhotoModel class]]) {
+        if (HXShowLog) NSSLog(@"请传入装着HXPhotoModel对象的数组");
+        return;
+    }
+    self.configuration.deleteTemporaryPhoto = NO;
+ 
+    [assetArray enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        if (!model.rIsVideo ) {
+ 
+                       [self.endCameraPhotos insertObject:model atIndex:0];
+                       
+                    [self.endSelectedCameraPhotos insertObject:model atIndex:0];
+                   [self.endCameraList insertObject:model atIndex:0];
+                   [self.endSelectedCameraList insertObject:model atIndex:0];
+                   [self.endSelectedPhotos insertObject:model atIndex:0];
+                   [self.endSelectedList insertObject:model atIndex:0];
+                }  else if (model.rIsVideo) {
+                  
+                   // 网络视频
+                   
+                    [self.endCameraVideos insertObject:model  atIndex:0];
+                   [self.endSelectedCameraVideos insertObject:model atIndex:0];
+                   [self.endCameraList insertObject:model  atIndex:0];
+                   [self.endSelectedCameraList insertObject:model atIndex:0];
+                   [self.endSelectedVideos insertObject:model  atIndex:0];
+                   [self.endSelectedList insertObject:model atIndex:0];
+                }
+        
+    }] ;
+    
+   
+}
+
 - (void)kl_addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray {
     if (!assetArray.count) return;
     if (![assetArray.firstObject isKindOfClass:[HXCustomAssetModel class]]) {
@@ -164,13 +201,11 @@
         return;
     }
     self.configuration.deleteTemporaryPhoto = NO;
-    NSInteger photoMaxCount = self.configuration.photoMaxNum;
-    NSInteger videoMaxCount = self.configuration.videoMaxNum;
-    NSInteger maxCount = self.configuration.maxNum;
+   
     NSInteger photoCount = self.endSelectedPhotos.count;
     NSInteger videoCount = self.endSelectedVideos.count;
-    BOOL canAddPhoto;
-    BOOL canAddVideo;
+    BOOL canAddPhoto = YES;
+    BOOL canAddVideo = YES;
     BOOL selectTogether = self.configuration.selectTogether;
     HXPhotoModel *firstModel;
     for (HXCustomAssetModel *model in assetArray) {

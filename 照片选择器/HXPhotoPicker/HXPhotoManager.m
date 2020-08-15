@@ -75,7 +75,7 @@
         [HXPhotoCommon photoCommon].cameraRollAlbumModel = nil;
         
     }
- 
+    
     
     [HXPhotoCommon photoCommon].rCurType = type;
     _type = type;
@@ -168,18 +168,9 @@
     
     if (atHeader) {
         
-         [assetArray enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
+        [assetArray enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
             
-            if (!model.rIsVideo ) {
-                
-                [self.endCameraPhotos insertObject:model atIndex:0];
-                
-                [self.endSelectedCameraPhotos insertObject:model atIndex:0];
-                [self.endCameraList insertObject:model atIndex:0];
-                [self.endSelectedCameraList insertObject:model atIndex:0];
-                [self.endSelectedPhotos insertObject:model atIndex:0];
-                [self.endSelectedList insertObject:model atIndex:0];
-            }  else if (model.rIsVideo) {
+            if (model.rIsVideo ||model.subType == HXPhotoModelMediaSubTypeVideo) {
                 
                 // 网络视频
                 
@@ -188,6 +179,14 @@
                 [self.endCameraList insertObject:model  atIndex:0];
                 [self.endSelectedCameraList insertObject:model atIndex:0];
                 [self.endSelectedVideos insertObject:model  atIndex:0];
+                [self.endSelectedList insertObject:model atIndex:0];
+            }else{
+                [self.endCameraPhotos insertObject:model atIndex:0];
+                
+                [self.endSelectedCameraPhotos insertObject:model atIndex:0];
+                [self.endCameraList insertObject:model atIndex:0];
+                [self.endSelectedCameraList insertObject:model atIndex:0];
+                [self.endSelectedPhotos insertObject:model atIndex:0];
                 [self.endSelectedList insertObject:model atIndex:0];
             }
             
@@ -235,7 +234,7 @@
         return;
     }
     self.configuration.deleteTemporaryPhoto = NO;
-   
+    
     NSInteger photoCount = self.endSelectedPhotos.count;
     NSInteger videoCount = self.endSelectedVideos.count;
     BOOL canAddPhoto = YES;

@@ -84,7 +84,8 @@ typedef NS_ENUM(NSUInteger, HXPhotoManagerVideoSelectedType) {
 - (void)addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray;
 - (void)kl_addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray;
 
-- (void)kl_InsetHXPhotoModel:(NSArray<HXPhotoModel *> *)assetArray ;
+- (void)kl_addHXPhotoModel:(NSArray<HXPhotoModel *> *)assetArray  atheader:(BOOL) atHeader;
+
 /**
  获取已选照片数组的照片总大小
  

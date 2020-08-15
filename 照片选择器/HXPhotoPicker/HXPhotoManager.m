@@ -158,40 +158,74 @@
     }
 }
 
-- (void)kl_InsetHXPhotoModel:(NSArray<HXPhotoModel *> *)assetArray   {
+- (void)kl_addHXPhotoModel:(NSArray<HXPhotoModel *> *)assetArray  atheader:(BOOL) atHeader {
     if (!assetArray.count) return;
     if (![assetArray.firstObject isKindOfClass:[HXPhotoModel class]]) {
         if (HXShowLog) NSSLog(@"请传入装着HXPhotoModel对象的数组");
         return;
     }
     self.configuration.deleteTemporaryPhoto = NO;
- 
-    [assetArray enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
-        
-        if (!model.rIsVideo ) {
- 
-                       [self.endCameraPhotos insertObject:model atIndex:0];
-                       
-                    [self.endSelectedCameraPhotos insertObject:model atIndex:0];
-                   [self.endCameraList insertObject:model atIndex:0];
-                   [self.endSelectedCameraList insertObject:model atIndex:0];
-                   [self.endSelectedPhotos insertObject:model atIndex:0];
-                   [self.endSelectedList insertObject:model atIndex:0];
-                }  else if (model.rIsVideo) {
-                  
-                   // 网络视频
-                   
-                    [self.endCameraVideos insertObject:model  atIndex:0];
-                   [self.endSelectedCameraVideos insertObject:model atIndex:0];
-                   [self.endCameraList insertObject:model  atIndex:0];
-                   [self.endSelectedCameraList insertObject:model atIndex:0];
-                   [self.endSelectedVideos insertObject:model  atIndex:0];
-                   [self.endSelectedList insertObject:model atIndex:0];
-                }
-        
-    }] ;
     
-   
+    if (atHeader) {
+        
+         [assetArray enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
+            
+            if (!model.rIsVideo ) {
+                
+                [self.endCameraPhotos insertObject:model atIndex:0];
+                
+                [self.endSelectedCameraPhotos insertObject:model atIndex:0];
+                [self.endCameraList insertObject:model atIndex:0];
+                [self.endSelectedCameraList insertObject:model atIndex:0];
+                [self.endSelectedPhotos insertObject:model atIndex:0];
+                [self.endSelectedList insertObject:model atIndex:0];
+            }  else if (model.rIsVideo) {
+                
+                // 网络视频
+                
+                [self.endCameraVideos insertObject:model  atIndex:0];
+                [self.endSelectedCameraVideos insertObject:model atIndex:0];
+                [self.endCameraList insertObject:model  atIndex:0];
+                [self.endSelectedCameraList insertObject:model atIndex:0];
+                [self.endSelectedVideos insertObject:model  atIndex:0];
+                [self.endSelectedList insertObject:model atIndex:0];
+            }
+            
+        }] ;
+        
+    }else{
+        
+        
+        [assetArray enumerateObjectsUsingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
+            
+            if (!model.rIsVideo ) {
+                
+                [self.endCameraPhotos addObject:model];
+                
+                [self.endSelectedCameraPhotos addObject:model];
+                [self.endCameraList addObject:model ];
+                [self.endSelectedCameraList addObject:model];
+                [self.endSelectedPhotos addObject:model ];
+                [self.endSelectedList addObject:model ];
+            }  else if (model.rIsVideo) {
+                
+                // 网络视频
+                
+                [self.endCameraVideos addObject:model];
+                [self.endSelectedCameraVideos addObject:model ];
+                [self.endCameraList addObject:model ];
+                [self.endSelectedCameraList addObject:model];
+                [self.endSelectedVideos addObject:model ];
+                [self.endSelectedList addObject:model];
+            }
+            
+            
+        }] ;
+        
+        
+    }
+    
+    
 }
 
 - (void)kl_addCustomAssetModel:(NSArray<HXCustomAssetModel *> *)assetArray {

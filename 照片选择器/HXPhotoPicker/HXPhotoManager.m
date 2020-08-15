@@ -198,16 +198,7 @@
         
         [assetArray enumerateObjectsUsingBlock:^(HXPhotoModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
             
-            if (!model.rIsVideo ) {
-                
-                [self.endCameraPhotos addObject:model];
-                
-                [self.endSelectedCameraPhotos addObject:model];
-                [self.endCameraList addObject:model ];
-                [self.endSelectedCameraList addObject:model];
-                [self.endSelectedPhotos addObject:model ];
-                [self.endSelectedList addObject:model ];
-            }  else if (model.rIsVideo) {
+            if (model.rIsVideo ||model.subType == HXPhotoModelMediaSubTypeVideo) {
                 
                 // 网络视频
                 
@@ -217,6 +208,15 @@
                 [self.endSelectedCameraList addObject:model];
                 [self.endSelectedVideos addObject:model ];
                 [self.endSelectedList addObject:model];
+            }else{
+                
+                [self.endCameraPhotos addObject:model];
+                
+                [self.endSelectedCameraPhotos addObject:model];
+                [self.endCameraList addObject:model ];
+                [self.endSelectedCameraList addObject:model];
+                [self.endSelectedPhotos addObject:model ];
+                [self.endSelectedList addObject:model ];
             }
             
             

@@ -243,6 +243,10 @@ typedef void (^HXPhotoViewLongGestureRecognizerEndedBlock)(UILongPressGestureRec
 -(UICollectionReusableView*)rCollectionSectionHeader:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath ;
 
 - (CGSize)rCollectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section;
+
+
+- (void)photoViewDidScroll:(UIScrollView *)scrollView;
+
 @end
 
 @interface  HXPhotoView : UIView

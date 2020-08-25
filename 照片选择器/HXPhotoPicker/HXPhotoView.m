@@ -448,7 +448,12 @@
     self.rCurrentPath = [NSIndexPath indexPathForRow:row inSection:0];
 }
 
-
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    
+    if ([self.delegate respondsToSelector:@selector(photoViewDidScroll:)]) {
+        [self.delegate photoViewDidScroll:scrollView];
+    }
+}
 
 #pragma mark - < HXPhotoPreviewViewControllerDelegate >
 - (void)photoPreviewControllerDidCancel:(HXPhotoPreviewViewController *)previewController model:(HXPhotoModel *)model {
